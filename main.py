@@ -1,33 +1,43 @@
+import logging
 from data_io.load_experiment import load_experiment_folder
 from logic.baseline_detection import estimate_baseline
 from logic.peak_detection import extract_peak
 
 DATA_DIR = "test_data"
 
-exp = load_experiment_folder(DATA_DIR)
-print(f"Загружено файлов: {len(exp)}")
 
-responses = []
+def main():
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
 
-for m in exp:
-    curve = m["curve"]
+    exp = load_experiment_folder(DATA_DIR)
+    logger.info("Loaded files: %d", len(exp))
 
-    E = curve[:, 0]
-    I = curve[:, 1]
+    responses = []
 
-    baseline = estimate_baseline(I)
-    peak = extract_peak(E, I, baseline)
+    for m in exp:
+        curve = m["curve"]
 
-    meta = m["meta"]
+        E = curve.E if hasattr(curve, "E") else curve[:, 0]
+        I = curve.I if hasattr(curve, "I") else curve[:, 1]
 
-    responses.append({
-        "file": meta.source_file,
-        "sensor": meta.sensor_type,
-        "enantiomer": meta.enantiomer,
-        "conc": meta.analyte_concentration,   # может быть None — и это ок
-        "I_peak": peak["I_peak"]
-    })
+        baseline = estimate_baseline(I)
+        peak = extract_peak(E, I, baseline)
 
-print("Пример:")
-for r in responses[:66]:
-    print(r)
+        meta = m["meta"]
+
+        responses.append({
+            "file": getattr(meta, "source_file", None),
+            "sensor": getattr(meta, "sensor_type", None),
+            "enantiomer": getattr(meta, "enantiomer", None),
+            "conc": getattr(meta, "analyte_concentration", None),
+            "I_peak": peak.get("I_peak")
+        })
+
+    logger.info("Example responses (first 10):")
+    for r in responses[:10]:
+        logger.info(r)
+
+
+if __name__ == "__main__":
+    main()

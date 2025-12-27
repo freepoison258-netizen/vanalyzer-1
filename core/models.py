@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-import numpy as np
 from typing import Optional
+import numpy as np
 
 
 @dataclass
@@ -11,16 +11,17 @@ class Voltammogram:
 
 @dataclass
 class MeasurementMeta:
-    analyte: Optional[str]
-    analyte_concentration: Optional[float]
+    analyte: Optional[str] = None
+    analyte_concentration: Optional[float] = None
 
-    modifier: Optional[str]
-    modifier_concentration: Optional[float]
+    modifier: Optional[str] = None
+    modifier_concentration: Optional[float] = None
 
-    sensor_type: Optional[str]   # bare / modified / MIP / NIP
-    replicate: Optional[int]
+    sensor_type: Optional[str] = None  # 'bare' / 'modified' / 'MIP' / 'NIP'
+    enantiomer: Optional[str] = None
+    replicate: Optional[int] = None
 
-    source_file: str
+    source_file: Optional[str] = None
 
 
 @dataclass
